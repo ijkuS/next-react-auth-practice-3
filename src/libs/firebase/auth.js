@@ -28,12 +28,15 @@ export async function logoutWithGoogle() {
 	}
 }
 export function onAuthStateChanged(callback) {
-	// return _onAuthStateChanged(firebaseAuth, callback);
-	_onAuthStateChanged(firebaseAuth, async (user) => {
+	const unsubscribe = _onAuthStateChanged(firebaseAuth, async (user) => {
 		const updatedUser = user ? await adminUser(user) : null;
-		console.log(updatedUser, 'this is updated user');
 		callback(updatedUser);
 	});
+	return unsubscribe;
+	// _onAuthStateChanged(firebaseAuth, async (user) => {
+	// 	const updatedUser = user ? await adminUser(user) : null;
+	// 	callback(updatedUser);
+	// });
 }
 async function adminUser(user) {
 	const dbRef = ref(firebaseRTDatabase, 'admins');
@@ -49,25 +52,3 @@ async function adminUser(user) {
 		console.log(error);
 	}
 }
-// export async function adminUser(user) {
-// 	const dbRef = ref(firebaseRTDatabase, 'admins');
-// 	try {
-// 		const snapshot = await get(dbRef);
-// 		if (snapshot.exists()) {
-// 			const admins = snapshot.val();
-
-// 			if (admins[user.uid]) {
-// 				const isAdmin = user.uid in admins ? true : false;
-// 				// const isAdmin = !!admins[user.uid]; // check if UID exists and has a truthy value
-// 				// console.log(admins, 'this is admins');
-// 				return { ...user, isAdmin: true };
-// 			}
-// 		}
-
-// 		console.log('No admins found in snapshot......');
-// 		return { ...user };
-// 	} catch (error) {
-// 		console.log('Error fetching admin data:', error);
-// 		return { ...user };
-// 	}
-// }

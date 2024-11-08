@@ -8,11 +8,8 @@ export default function useUserSession(initSession) {
 	// Listen for changes to the user session
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(async (authUser) => {
-			if (authUser) {
-				setUser(authUser.uid);
-			} else {
-				setUser(null);
-			}
+			setUser(authUser ? authUser.uid : null);
+			console.log(authUser, 'this is from authUser');
 		});
 		return () => unsubscribe();
 	}, []);
