@@ -4,7 +4,7 @@ import {
 	signInWithPopup,
 } from 'firebase/auth';
 import { firebaseAuth, firebaseRTDatabase } from './config';
-import { get, ref } from 'firebase/database';
+import { get, getDatabase, ref } from 'firebase/database';
 
 export async function loginWithGoogle() {
 	const provider = new GoogleAuthProvider();
@@ -35,21 +35,39 @@ export function onAuthStateChanged(callback) {
 		callback(updatedUser);
 	});
 }
-export async function adminUser(user) {
+async function adminUser(user) {
 	const dbRef = ref(firebaseRTDatabase, 'admins');
 	try {
 		const snapshot = await get(dbRef);
 		if (snapshot.exists()) {
 			const admins = snapshot.val();
-			const isAdmin = user.uid in admins;
-			console.log(admins, 'this is admins');
-			// const isAdmin = admins.includes(user.uid);
-			return { ...user, isAdmin: true };
+			const isAdmin = admins.includes(user.uid);
+			return { ...user, isAdmin };
 		}
-		console.log('No admins found in snapshot......');
-		return { ...user };
+		return user;
 	} catch (error) {
-		console.log('Error fetching admin data:', error);
-		return { ...user };
+		console.log(error);
 	}
 }
+// export async function adminUser(user) {
+// 	const dbRef = ref(firebaseRTDatabase, 'admins');
+// 	try {
+// 		const snapshot = await get(dbRef);
+// 		if (snapshot.exists()) {
+// 			const admins = snapshot.val();
+
+// 			if (admins[user.uid]) {
+// 				const isAdmin = user.uid in admins ? true : false;
+// 				// const isAdmin = !!admins[user.uid]; // check if UID exists and has a truthy value
+// 				// console.log(admins, 'this is admins');
+// 				return { ...user, isAdmin: true };
+// 			}
+// 		}
+
+// 		console.log('No admins found in snapshot......');
+// 		return { ...user };
+// 	} catch (error) {
+// 		console.log('Error fetching admin data:', error);
+// 		return { ...user };
+// 	}
+// }
